@@ -1,0 +1,38 @@
+{
+  "name": "cart",
+  "label": "Cart",
+  "description": "Shopping cart with guest cart tokens and user cart synchronization on login.",
+  "type": "feature",
+  "dependsOn": ["products"],
+  "uses": [],
+  "variants": {
+    "db": {
+      "mongodb": {
+        "path": "backend/db/mongodb",
+        "dependencies": {
+          "mongoose": "^8"
+        }
+      },
+      "postgresql": {
+        "path": "backend/db/postgresql",
+        "dependencies": {
+          "drizzle-orm": "~0.36",
+          "pg": "^8"
+        },
+        "devDependencies": {
+          "drizzle-kit": "~0.30",
+          "@types/pg": "^8"
+        }
+      }
+    }
+  },
+  "backend": {
+    "basePath": "/api/cart"
+  },
+  "frontend": {
+    "apiSlice": "cartApi",
+    "storefrontComponents": ["CartDrawer", "CartItemRow"]
+  },
+  "since": "0.1.0"
+}
+
