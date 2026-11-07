@@ -1,0 +1,25 @@
+{
+  "name": "auth",
+  "label": "Authentication",
+  "description": "JWT authentication, login, registration, refresh tokens, and role-based access control.",
+  "type": "core",
+  "dependsOn": ["users"],
+  "uses": [],
+  "dependencies": {
+    "bcryptjs": "^3.0.0",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.8"
+  },
+  "backend": {
+    "basePath": "/api/auth"
+  },
+  "frontend": {
+    "apiSlice": "authApi",
+    "storefrontComponents": ["LoginForm", "RegisterForm"]
+  },
+  "since": "0.1.0"
+}
+
