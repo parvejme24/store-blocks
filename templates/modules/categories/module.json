@@ -1,0 +1,43 @@
+{
+  "name": "categories",
+  "label": "Categories",
+  "description": "Category hierarchy, slugs, navigation, and SEO metadata.",
+  "type": "core",
+  "dependsOn": [],
+  "uses": [],
+  "variants": {
+    "db": {
+      "mongodb": {
+        "path": "backend/db/mongodb",
+        "dependencies": {
+          "mongoose": "^8"
+        }
+      },
+      "postgresql": {
+        "path": "backend/db/postgresql",
+        "dependencies": {
+          "drizzle-orm": "~0.36",
+          "pg": "^8"
+        },
+        "devDependencies": {
+          "drizzle-kit": "~0.30",
+          "@types/pg": "^8"
+        }
+      }
+    }
+  },
+  "backend": {
+    "basePath": "/api/categories"
+  },
+  "frontend": {
+    "apiSlice": "categoriesApi",
+    "adminMenu": {
+      "label": "Categories",
+      "icon": "FolderTree",
+      "href": "/admin/categories"
+    },
+    "storefrontComponents": ["CategoryNav", "CategoryGrid"]
+  },
+  "since": "0.1.0"
+}
+
