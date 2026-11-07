@@ -1,0 +1,43 @@
+{
+  "name": "reviews",
+  "label": "Product Reviews",
+  "description": "Customer ratings and reviews, visible after admin approval.",
+  "type": "feature",
+  "dependsOn": ["auth", "products"],
+  "uses": [],
+  "variants": {
+    "db": {
+      "mongodb": {
+        "path": "backend/db/mongodb",
+        "dependencies": {
+          "mongoose": "^8"
+        }
+      },
+      "postgresql": {
+        "path": "backend/db/postgresql",
+        "dependencies": {
+          "drizzle-orm": "~0.36",
+          "pg": "^8"
+        },
+        "devDependencies": {
+          "drizzle-kit": "~0.30",
+          "@types/pg": "^8"
+        }
+      }
+    }
+  },
+  "backend": {
+    "basePath": "/api/reviews"
+  },
+  "frontend": {
+    "apiSlice": "reviewsApi",
+    "adminMenu": {
+      "label": "Reviews",
+      "icon": "MessageSquare",
+      "href": "/admin/reviews"
+    },
+    "storefrontComponents": ["ProductReviews", "ReviewForm"]
+  },
+  "since": "0.1.0"
+}
+
