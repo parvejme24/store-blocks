@@ -1,0 +1,38 @@
+{
+  "name": "wishlist",
+  "label": "Wishlist",
+  "description": "Customer saved items, wishlist management, and quick add-to-cart transfer.",
+  "type": "feature",
+  "dependsOn": ["auth", "products"],
+  "uses": [],
+  "variants": {
+    "db": {
+      "mongodb": {
+        "path": "backend/db/mongodb",
+        "dependencies": {
+          "mongoose": "^8"
+        }
+      },
+      "postgresql": {
+        "path": "backend/db/postgresql",
+        "dependencies": {
+          "drizzle-orm": "~0.36",
+          "pg": "^8"
+        },
+        "devDependencies": {
+          "drizzle-kit": "~0.30",
+          "@types/pg": "^8"
+        }
+      }
+    }
+  },
+  "backend": {
+    "basePath": "/api/wishlist"
+  },
+  "frontend": {
+    "apiSlice": "wishlistApi",
+    "storefrontComponents": ["WishlistButton", "WishlistDrawer"]
+  },
+  "since": "0.1.0"
+}
+
