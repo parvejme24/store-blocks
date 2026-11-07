@@ -1,0 +1,48 @@
+{
+  "name": "products",
+  "label": "Products",
+  "description": "Product catalog: CRUD, variants, stock, images, search, filters, and sorting.",
+  "type": "core",
+  "dependsOn": [],
+  "uses": ["storage"],
+  "variants": {
+    "db": {
+      "mongodb": {
+        "path": "backend/db/mongodb",
+        "dependencies": {
+          "mongoose": "^8"
+        }
+      },
+      "postgresql": {
+        "path": "backend/db/postgresql",
+        "dependencies": {
+          "drizzle-orm": "~0.36",
+          "pg": "^8"
+        },
+        "devDependencies": {
+          "drizzle-kit": "~0.30",
+          "@types/pg": "^8"
+        }
+      }
+    }
+  },
+  "backend": {
+    "basePath": "/api/products"
+  },
+  "frontend": {
+    "apiSlice": "productsApi",
+    "adminMenu": {
+      "label": "Products",
+      "icon": "Package",
+      "href": "/admin/products"
+    },
+    "storefrontComponents": [
+      "ProductCard",
+      "ProductGallery",
+      "ProductFilters",
+      "VariantPicker"
+    ]
+  },
+  "since": "0.1.0"
+}
+
