@@ -1,0 +1,20 @@
+{
+  "name": "social-boost",
+  "label": "Social Boost & Feeds",
+  "description": "Product catalog RSS/XML feed for Google & Meta, Open Graph tags, and social share links.",
+  "type": "feature",
+  "dependsOn": ["products"],
+  "uses": [],
+  "optionalEnv": [
+    "META_PIXEL_ID",
+    "GOOGLE_TAG_MANAGER_ID"
+  ],
+  "backend": {
+    "basePath": "/api/social"
+  },
+  "frontend": {
+    "storefrontComponents": ["SocialShareButtons", "MetaPixelScript"]
+  },
+  "since": "0.1.0"
+}
+
