@@ -1,0 +1,17 @@
+{
+  "name": "payment-sslcommerz",
+  "label": "SSLCommerz",
+  "description": "Leading Bangladeshi payment gateway supporting Cards, bKash, Nagad, Rocket, and Internet Banking.",
+  "type": "payment",
+  "dependsOn": [],
+  "uses": [],
+  "env": [
+    "SSLC_STORE_ID",
+    "SSLC_STORE_PASSWD"
+  ],
+  "optionalEnv": [
+    "SSLC_IS_SANDBOX"
+  ],
+  "since": "0.1.0"
+}
+

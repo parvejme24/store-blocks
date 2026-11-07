@@ -1,0 +1,17 @@
+{
+  "name": "payment-stripe",
+  "label": "Stripe",
+  "description": "Global payment gateway accepting Credit/Debit Cards, Apple Pay, Google Pay, and local payment methods.",
+  "type": "payment",
+  "dependsOn": [],
+  "uses": [],
+  "dependencies": {
+    "stripe": "^17.7.0"
+  },
+  "env": [
+    "STRIPE_SECRET_KEY",
+    "STRIPE_WEBHOOK_SECRET"
+  ],
+  "since": "0.1.0"
+}
+

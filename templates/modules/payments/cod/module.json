@@ -1,0 +1,10 @@
+{
+  "name": "payment-cod",
+  "label": "Cash on Delivery",
+  "description": "Allows customers to pay in cash upon receiving order delivery.",
+  "type": "payment",
+  "dependsOn": [],
+  "uses": [],
+  "since": "0.1.0"
+}
+
