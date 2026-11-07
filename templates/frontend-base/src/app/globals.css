@@ -1,0 +1,211 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * StoreBlocks theme: deep black surfaces with violet accents.
+ * Tokens are HSL channel triplets so Tailwind's `hsl(var(--x))` works.
+ * The app always renders dark (see <html className="dark"> in layout.tsx).
+ */
+@layer base {
+  :root {
+    --background: 265 35% 4%;
+    --foreground: 270 30% 97%;
+    --card: 265 28% 7%;
+    --card-foreground: 270 30% 97%;
+    --popover: 265 28% 7%;
+    --popover-foreground: 270 30% 97%;
+    --primary: 265 90% 66%;
+    --primary-foreground: 265 40% 97%;
+    --secondary: 265 22% 12%;
+    --secondary-foreground: 270 30% 97%;
+    --muted: 265 20% 11%;
+    --muted-foreground: 260 12% 65%;
+    --accent: 268 45% 18%;
+    --accent-foreground: 270 30% 97%;
+    --destructive: 0 72% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 265 24% 16%;
+    --input: 265 24% 16%;
+    --ring: 265 90% 66%;
+    --radius: 0.75rem;
+    --code: 265 40% 3%;
+    --code-foreground: 268 25% 88%;
+  }
+
+  .dark {
+    --background: 265 35% 4%;
+    --foreground: 270 30% 97%;
+    --card: 265 28% 7%;
+    --card-foreground: 270 30% 97%;
+    --popover: 265 28% 7%;
+    --popover-foreground: 270 30% 97%;
+    --primary: 265 90% 66%;
+    --primary-foreground: 265 40% 97%;
+    --secondary: 265 22% 12%;
+    --secondary-foreground: 270 30% 97%;
+    --muted: 265 20% 11%;
+    --muted-foreground: 260 12% 65%;
+    --accent: 268 45% 18%;
+    --accent-foreground: 270 30% 97%;
+    --destructive: 0 72% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 265 24% 16%;
+    --input: 265 24% 16%;
+    --ring: 265 90% 66%;
+    --code: 265 40% 3%;
+    --code-foreground: 268 25% 88%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  html {
+    scroll-padding-top: 5rem;
+    color-scheme: dark;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+}
+
+@layer components {
+  /* Gradient text for headline accents. */
+  .text-gradient {
+    @apply bg-gradient-to-r from-violet-300 via-fuchsia-300 to-purple-400 bg-clip-text text-transparent;
+  }
+
+  /* Soft purple glow behind hero areas. */
+  .glow-violet {
+    background: radial-gradient(
+      closest-side,
+      hsl(265 90% 66% / 0.35),
+      hsl(265 90% 66% / 0) 70%
+    );
+  }
+
+  /* Subtle dotted grid used on hero backgrounds. */
+  .bg-dot-grid {
+    background-image: radial-gradient(hsl(265 24% 30% / 0.5) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* Glass surface for header and floating panels. */
+  .glass {
+    @apply border-white/5 bg-background/70 backdrop-blur-xl;
+  }
+
+  /* Gradient primary button. */
+  .btn-brand {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-violet-600/25 transition-all hover:brightness-110 hover:shadow-violet-500/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+
+  /* Outline secondary button. */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-violet-400/40 hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring;
+  }
+}
+
+/* Slim, theme-coloured scrollbars everywhere (Firefox and Chromium/Safari). */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--border)) transparent;
+}
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 999px;
+}
+
+@layer utilities {
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hero background motion. Users who prefer reduced motion get a static background. */
+  .animate-aurora {
+    animation: sb-aurora 16s ease-in-out infinite;
+  }
+  .animate-grid-drift {
+    animation: sb-grid-drift 28s linear infinite;
+  }
+  .animate-float {
+    animation: sb-float 6s ease-in-out infinite;
+  }
+  .animate-shimmer {
+    animation: sb-shimmer 1.6s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-aurora,
+    .animate-grid-drift,
+    .animate-float,
+    .animate-shimmer {
+      animation: none;
+    }
+  }
+}
+
+@keyframes sb-aurora {
+  0%,
+  100% {
+    transform: translate3d(-4%, -3%, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(5%, 4%, 0) scale(1.1);
+  }
+}
+
+@keyframes sb-grid-drift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 48px 48px;
+  }
+}
+
+@keyframes sb-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -8px, 0);
+  }
+}
+
+@keyframes sb-shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
