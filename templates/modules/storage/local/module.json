@@ -1,0 +1,14 @@
+{
+  "name": "storage-local",
+  "label": "Local Disk",
+  "description": "Local disk storage for development and single-server deployments.",
+  "type": "storage",
+  "dependsOn": [],
+  "uses": [],
+  "optionalEnv": [
+    "UPLOAD_DIR",
+    "PUBLIC_STORAGE_URL"
+  ],
+  "since": "0.1.0"
+}
+

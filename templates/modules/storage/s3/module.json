@@ -1,0 +1,24 @@
+{
+  "name": "storage-s3",
+  "label": "AWS S3 / S3-compatible",
+  "description": "Object storage with AWS S3, Cloudflare R2, MinIO, or DigitalOcean Spaces via presigned PUT uploads.",
+  "type": "storage",
+  "dependsOn": [],
+  "uses": [],
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.758.0",
+    "@aws-sdk/s3-request-presigner": "^3.758.0"
+  },
+  "env": [
+    "S3_BUCKET",
+    "S3_REGION",
+    "S3_ACCESS_KEY_ID",
+    "S3_SECRET_ACCESS_KEY"
+  ],
+  "optionalEnv": [
+    "S3_ENDPOINT",
+    "S3_PUBLIC_URL"
+  ],
+  "since": "0.1.0"
+}
+

@@ -1,0 +1,21 @@
+{
+  "name": "storage-cloudinary",
+  "label": "Cloudinary",
+  "description": "Hosted media storage with on-the-fly transformations and CDN delivery.",
+  "type": "storage",
+  "dependsOn": [],
+  "uses": [],
+  "dependencies": {
+    "cloudinary": "^2.5.1"
+  },
+  "env": [
+    "CLOUDINARY_CLOUD_NAME",
+    "CLOUDINARY_API_KEY",
+    "CLOUDINARY_API_SECRET"
+  ],
+  "frontend": {
+    "imageHosts": ["res.cloudinary.com"]
+  },
+  "since": "0.1.0"
+}
+
