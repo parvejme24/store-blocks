@@ -1,0 +1,43 @@
+{
+  "name": "orders",
+  "label": "Orders",
+  "description": "Order management, order status lifecycle, checkout calculations, and admin order fulfillment.",
+  "type": "core",
+  "dependsOn": ["products"],
+  "uses": ["payments"],
+  "variants": {
+    "db": {
+      "mongodb": {
+        "path": "backend/db/mongodb",
+        "dependencies": {
+          "mongoose": "^8"
+        }
+      },
+      "postgresql": {
+        "path": "backend/db/postgresql",
+        "dependencies": {
+          "drizzle-orm": "~0.36",
+          "pg": "^8"
+        },
+        "devDependencies": {
+          "drizzle-kit": "~0.30",
+          "@types/pg": "^8"
+        }
+      }
+    }
+  },
+  "backend": {
+    "basePath": "/api/orders"
+  },
+  "frontend": {
+    "apiSlice": "ordersApi",
+    "adminMenu": {
+      "label": "Orders",
+      "icon": "ShoppingCart",
+      "href": "/admin/orders"
+    },
+    "storefrontComponents": ["OrderSummary", "CheckoutForm"]
+  },
+  "since": "0.1.0"
+}
+
