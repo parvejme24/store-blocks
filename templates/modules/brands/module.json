@@ -1,0 +1,43 @@
+{
+  "name": "brands",
+  "label": "Brands",
+  "description": "Brand directory, logos, website links, and brand-filtered product showcases.",
+  "type": "feature",
+  "dependsOn": ["products"],
+  "uses": [],
+  "variants": {
+    "db": {
+      "mongodb": {
+        "path": "backend/db/mongodb",
+        "dependencies": {
+          "mongoose": "^8"
+        }
+      },
+      "postgresql": {
+        "path": "backend/db/postgresql",
+        "dependencies": {
+          "drizzle-orm": "~0.36",
+          "pg": "^8"
+        },
+        "devDependencies": {
+          "drizzle-kit": "~0.30",
+          "@types/pg": "^8"
+        }
+      }
+    }
+  },
+  "backend": {
+    "basePath": "/api/brands"
+  },
+  "frontend": {
+    "apiSlice": "brandsApi",
+    "adminMenu": {
+      "label": "Brands",
+      "icon": "Tag",
+      "href": "/admin/brands"
+    },
+    "storefrontComponents": ["BrandGrid", "BrandCarousel"]
+  },
+  "since": "0.1.0"
+}
+
