@@ -1,0 +1,42 @@
+{
+  "name": "settings",
+  "label": "Settings",
+  "description": "Store configuration: store name, logo, contact info, social links, and currency.",
+  "type": "core",
+  "dependsOn": [],
+  "uses": [],
+  "variants": {
+    "db": {
+      "mongodb": {
+        "path": "backend/db/mongodb",
+        "dependencies": {
+          "mongoose": "^8"
+        }
+      },
+      "postgresql": {
+        "path": "backend/db/postgresql",
+        "dependencies": {
+          "drizzle-orm": "~0.36",
+          "pg": "^8"
+        },
+        "devDependencies": {
+          "drizzle-kit": "~0.30",
+          "@types/pg": "^8"
+        }
+      }
+    }
+  },
+  "backend": {
+    "basePath": "/api/settings"
+  },
+  "frontend": {
+    "apiSlice": "settingsApi",
+    "adminMenu": {
+      "label": "Settings",
+      "icon": "Settings",
+      "href": "/admin/settings"
+    }
+  },
+  "since": "0.1.0"
+}
+
