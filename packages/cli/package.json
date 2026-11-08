@@ -2,7 +2,9 @@
   "name": "create-storeblocks",
   "version": "0.1.0",
   "description": "Scaffold a production-ready, full-stack e-commerce store in minutes",
-  "bin": "./dist/index.js",
+  "bin": {
+    "create-storeblocks": "dist/index.js"
+  },
   "files": [
     "dist",
     "templates"

@@ -22,3 +22,4 @@ await fs.copy(sourceTemplates, destTemplates, {
 });
 
 console.log("Templates synced successfully.");
+
