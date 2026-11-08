@@ -23,7 +23,8 @@ export function formatDate(iso: string) {
 function useMonthly(data: DemoDataset) {
   return useMemo(() => {
     const months = Array.from({ length: 6 }, (_, i) => {
-      const key = addMonthsIso(DEMO_TODAY, i - 5);
+      const fullIso = addMonthsIso(DEMO_TODAY, i - 5);
+      const key = fullIso.slice(0, 7);
       return { key, label: MONTHS[Number(key.slice(5, 7)) - 1] };
     });
     const totals = new Map(months.map((m) => [m.key, 0]));
