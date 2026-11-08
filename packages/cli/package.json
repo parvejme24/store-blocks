@@ -1,15 +1,43 @@
 {
   "name": "create-storeblocks",
-  "version": "0.1.0",
-  "description": "Scaffold a production-ready, full-stack e-commerce store in minutes",
+  "version": "0.1.1",
+  "description": "Scaffold a production-ready, full-stack modular e-commerce store in minutes",
   "bin": {
     "create-storeblocks": "dist/index.js"
   },
   "files": [
     "dist",
-    "templates"
+    "templates",
+    "README.md"
   ],
   "type": "module",
+  "author": "Md Parvej <mdparvejmep@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/parvejme24/store-blocks.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/parvejme24/store-blocks#readme",
+  "bugs": {
+    "url": "https://github.com/parvejme24/store-blocks/issues"
+  },
+  "keywords": [
+    "ecommerce",
+    "e-commerce",
+    "storefront",
+    "scaffold",
+    "cli",
+    "nextjs",
+    "express",
+    "drizzle",
+    "mongoose",
+    "mongodb",
+    "postgresql",
+    "fullstack",
+    "generator",
+    "storeblocks"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
