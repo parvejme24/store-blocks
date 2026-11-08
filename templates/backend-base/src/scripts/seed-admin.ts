@@ -86,3 +86,4 @@ main().catch((err) => {
   logger.error({ err }, "Admin seeding failed");
   process.exit(1);
 });
+

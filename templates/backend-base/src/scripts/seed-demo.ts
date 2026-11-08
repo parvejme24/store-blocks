@@ -339,3 +339,4 @@ main().catch((err) => {
   logger.error({ err }, "Demo catalog seeding failed");
   process.exit(1);
 });
+
