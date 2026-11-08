@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { motion } from "motion/react";
 import { CheckCircle2, CircleDollarSign, Package, ShoppingCart, TrendingUp, Users } from "lucide-react";
-import { formatPrice } from "@/lib/format";
+import { formatPrice, formatCompactPrice } from "@/lib/format";
 import type { DemoDataset } from "../demo/dataset";
 import { EmptyRow, Panel, Pill, StatCard, Table, Td, Tr, type Tone } from "../ui/primitives";
 import { DEMO_TODAY } from "../demo/dataset";
@@ -27,33 +27,98 @@ function useMonthly(data: DemoDataset) {
       return { key, label: MONTHS[Number(key.slice(5, 7)) - 1] };
     });
     const totals = new Map(months.map((m) => [m.key, 0]));
+    const cancelledTotals = new Map(months.map((m) => [m.key, 0]));
+    const orderCounts = new Map(months.map((m) => [m.key, 0]));
+
     for (const order of data.orders) {
-      if (order.status === "cancelled") continue;
       const key = order.createdAt.slice(0, 7);
-      if (totals.has(key)) totals.set(key, (totals.get(key) ?? 0) + order.totalMinor);
+      if (!totals.has(key)) continue;
+
+      if (order.status === "cancelled") {
+        cancelledTotals.set(key, (cancelledTotals.get(key) ?? 0) + order.totalMinor);
+      } else {
+        totals.set(key, (totals.get(key) ?? 0) + order.totalMinor);
+        orderCounts.set(key, (orderCounts.get(key) ?? 0) + 1);
+      }
     }
+
     const values = months.map((m) => totals.get(m.key) ?? 0);
     const max = Math.max(...values, 1);
-    return months.map((m, i) => ({ label: m.label, value: values[i], pct: Math.round((values[i] / max) * 100) }));
+    const bars = months.map((m, i) => ({
+      label: m.label,
+      key: m.key,
+      value: values[i],
+      ordersCount: orderCounts.get(m.key) ?? 0,
+      cancelledValue: cancelledTotals.get(m.key) ?? 0,
+      pct: Math.round((values[i] / max) * 100)
+    }));
+
+    const totalNet = values.reduce((sum, v) => sum + v, 0);
+    const totalCancelled = Array.from(cancelledTotals.values()).reduce((sum, v) => sum + v, 0);
+    const avgMonthly = Math.round(totalNet / 6);
+
+    return { bars, totalNet, totalCancelled, avgMonthly };
   }, [data.orders]);
 }
 
 function MonthlyChart({ data, height = "h-48" }: { data: DemoDataset; height?: string }) {
-  const monthly = useMonthly(data);
+  const { bars, totalNet, totalCancelled, avgMonthly } = useMonthly(data);
+  const currency = data.settings.currency;
+
   return (
-    <div className={`flex ${height} items-end gap-3`} role="img" aria-label="Net revenue by month">
-      {monthly.map((bar, i) => (
-        <div key={bar.label} className="flex h-full flex-1 flex-col items-center justify-end gap-2">
-          <motion.div
-            className="w-full rounded-t-lg bg-gradient-to-t from-primary/50 via-primary/80 to-primary shadow-lg shadow-primary/10"
-            initial={{ height: 0 }}
-            animate={{ height: Math.max(Math.round(bar.pct * 1.6), 4) }}
-            transition={{ duration: 0.7, delay: i * 0.07, ease: EASE }}
-            title={`${bar.label}: ${formatPrice(bar.value, data.settings.currency)}`}
-          />
-          <span className="text-[11px] font-medium text-muted-foreground">{bar.label}</span>
+    <div className="space-y-4">
+      {/* 6-Month Metric Summary Ribbon */}
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/50 pb-3 text-xs">
+        <div className="flex items-center gap-4">
+          <div>
+            <span className="text-muted-foreground block text-[11px]">6-Month Net Total</span>
+            <span className="font-bold text-foreground text-sm tabular-nums">
+              {formatPrice(totalNet, currency)}
+            </span>
+          </div>
+          <div className="hidden sm:block border-l border-border/60 pl-4">
+            <span className="text-muted-foreground block text-[11px]">Monthly Average</span>
+            <span className="font-semibold text-foreground tabular-nums">
+              {formatPrice(avgMonthly, currency)}
+            </span>
+          </div>
         </div>
-      ))}
+        <div className="flex items-center gap-1.5 rounded-full bg-secondary/80 px-2.5 py-1 text-[11px] font-medium text-foreground">
+          <span className="text-muted-foreground">Excluded cancellations:</span>
+          <span className="font-semibold text-destructive tabular-nums">
+            {formatPrice(totalCancelled, currency)}
+          </span>
+        </div>
+      </div>
+
+      {/* Bar Chart */}
+      <div className={`flex ${height} items-end gap-2 sm:gap-4 pt-2`} role="img" aria-label="Net revenue by month">
+        {bars.map((bar, i) => (
+          <div key={bar.label} className="group relative flex h-full flex-1 flex-col items-center justify-end gap-2">
+            {/* Value Label above bar */}
+            <span className="text-[10px] sm:text-[11px] font-semibold tabular-nums text-foreground/80 opacity-90 transition-opacity group-hover:opacity-100">
+              {formatCompactPrice(bar.value, currency)}
+            </span>
+
+            {/* Bar container */}
+            <div className="w-full flex-1 flex items-end">
+              <motion.div
+                className="w-full rounded-t-lg bg-gradient-to-t from-primary/50 via-primary/80 to-primary shadow-md shadow-primary/10 transition-colors group-hover:brightness-110"
+                style={{ minHeight: "6px" }}
+                initial={{ height: 0 }}
+                animate={{ height: `${Math.max(bar.pct, 4)}%` }}
+                transition={{ duration: 0.7, delay: i * 0.07, ease: EASE }}
+                title={`${bar.label}: ${formatPrice(bar.value, currency)} (${bar.ordersCount} paid orders, excludes ${formatPrice(bar.cancelledValue, currency)} cancelled)`}
+              />
+            </div>
+
+            {/* Month label */}
+            <span className="text-[11px] font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+              {bar.label}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

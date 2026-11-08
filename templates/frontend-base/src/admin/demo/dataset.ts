@@ -207,8 +207,21 @@ const ADDRESSES = [
   "KDA Avenue, Khulna",
   "Gulshan 2, Circle 1"
 ];
-/** Days before DEMO_TODAY for each seeded order, so three orders are from today. */
-const ORDER_AGE_DAYS = [0, 0, 0, 1, 1, 2, 3, 4, 5, 6, 8, 10, 12, 14];
+/** Days before DEMO_TODAY for seeded orders across the last six months */
+const ORDER_AGE_DAYS = [
+  // Current month (Month 0: ~0-20 days ago) - includes fresh orders for today
+  0, 0, 0, 1, 1, 2, 3, 4, 5, 6, 8, 10, 12, 14, 18, 20,
+  // 1 month ago (Month -1: ~25-55 days ago)
+  26, 29, 32, 35, 38, 42, 46, 50, 54,
+  // 2 months ago (Month -2: ~58-85 days ago)
+  58, 62, 67, 71, 76, 80, 84,
+  // 3 months ago (Month -3: ~88-115 days ago)
+  88, 92, 98, 103, 108, 114,
+  // 4 months ago (Month -4: ~118-145 days ago)
+  118, 124, 130, 136, 142,
+  // 5 months ago (Month -5: ~148-175 days ago)
+  148, 154, 160, 166, 172
+];
 const ORDER_STATUSES: OrderStatus[] = ["pending", "confirmed", "processing", "shipped", "delivered", "delivered", "cancelled"];
 const REVIEW_COMMENTS = ["Great quality, arrived quickly.", "Exactly as described.", "Would buy again.", "Good value for the price.", "Packaging could be better."];
 
@@ -339,7 +352,12 @@ export function buildDemoDataset(template: StoreTemplate): DemoDataset {
     const couponCode = i % 5 === 0 && subtotalMinor > 5000 ? "WELCOME50" : null;
     const discountMinor = couponCode ? 5000 : 0;
     const taxMinor = Math.round(lines.reduce((sum, product, n) => sum + product.priceMinor * items[n].quantity * (product.taxRate / 100), 0));
-    const status = ORDER_STATUSES[i % ORDER_STATUSES.length];
+    const status =
+      age <= 14
+        ? ORDER_STATUSES[i % ORDER_STATUSES.length]
+        : i % 8 === 0
+        ? "cancelled"
+        : "delivered";
     const paymentMethod: PaymentMethod = i % 3 === 0 ? "sslcommerz" : i % 7 === 0 ? "stripe" : "cod";
     const paymentStatus: PaymentStatus =
       status === "cancelled" ? "unpaid" : paymentMethod !== "cod" || status === "delivered" ? "paid" : "unpaid";

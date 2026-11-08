@@ -10,3 +10,17 @@ export function formatPrice(amountMinor: number, currency: string): string {
     return `${amount.toLocaleString("en-US", { minimumFractionDigits: 2 })} ${currency}`;
   }
 }
+
+/**
+ * Formats large amounts compactly (e.g. "14.5k BDT", "1.2M BDT") for charts and badges.
+ */
+export function formatCompactPrice(amountMinor: number, currency: string): string {
+  const amount = amountMinor / 100;
+  if (amount >= 1_000_000) {
+    return `${(amount / 1_000_000).toFixed(1)}M ${currency}`;
+  }
+  if (amount >= 1_000) {
+    return `${(amount / 1_000).toFixed(1)}k ${currency}`;
+  }
+  return formatPrice(amountMinor, currency);
+}
