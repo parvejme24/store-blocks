@@ -5,12 +5,17 @@
   "bin": {
     "create-storeblocks": "./dist/index.js"
   },
+  "files": [
+    "dist",
+    "templates"
+  ],
   "type": "module",
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test test/**/*.test.ts"
+    "test": "tsx --test test/**/*.test.ts",
+    "prepack": "npm run build && node scripts/copy-templates.mjs"
   },
   "dependencies": {
     "@clack/prompts": "^0.9.1",
