@@ -221,9 +221,16 @@ export async function generateProject(
   envExampleContent += `JWT_ACCESS_SECRET=replace_with_super_secret_key_at_least_16_chars\n`;
   envExampleContent += `JWT_REFRESH_SECRET=replace_with_super_refresh_key_at_least_16_chars\n\n`;
 
-  envExampleContent += `# Required for selected database and modules\n`;
+  envExampleContent += `# Database Connection (matches docker-compose.yml)\n`;
+  if (choices.database === "mongodb") {
+    envExampleContent += `MONGODB_URI=mongodb://localhost:27017/storeblocks\n\n`;
+  } else {
+    envExampleContent += `DATABASE_URL=postgresql://storeblocks:storeblocks_password@localhost:5432/storeblocks\n\n`;
+  }
+
+  envExampleContent += `# Required for selected modules\n`;
   for (const v of envVars) {
-    if (!["NODE_ENV", "PORT", "FRONTEND_URL", "JWT_ACCESS_SECRET", "JWT_REFRESH_SECRET"].includes(v)) {
+    if (!["NODE_ENV", "PORT", "FRONTEND_URL", "JWT_ACCESS_SECRET", "JWT_REFRESH_SECRET", "MONGODB_URI", "DATABASE_URL"].includes(v)) {
       envExampleContent += `${v}=\n`;
     }
   }
@@ -237,7 +244,11 @@ export async function generateProject(
 
   await fs.writeFile(path.join(targetDir, ".env.example"), envExampleContent);
 
-  // 6b. Connect the storefront to the API automatically (no secrets: this is a public URL)
+  // 6b. Generate docker-compose.yml for local infrastructure
+  const dockerComposeContent = buildDockerCompose(choices.projectName, choices.database, choices.storage);
+  await fs.writeFile(path.join(targetDir, "docker-compose.yml"), dockerComposeContent);
+
+  // 6c. Connect the storefront to the API automatically (no secrets: this is a public URL)
   if (await fs.pathExists(path.join(targetDir, "frontend"))) {
     await fs.writeFile(
       path.join(targetDir, "frontend", ".env.local"),
@@ -245,7 +256,7 @@ export async function generateProject(
     );
   }
 
-  // 6c. Generate README.md describing this store (variable names only, never values)
+  // 6d. Generate README.md describing this store (variable names only, never values)
   await fs.writeFile(
     path.join(targetDir, "README.md"),
     buildStoreReadme({
@@ -272,7 +283,12 @@ export async function generateProject(
       dev: "npm run dev --workspaces --if-present",
       build: "npm run build --workspaces --if-present",
       "dev:backend": "npm --workspace=backend run dev",
-      "dev:frontend": "npm --workspace=frontend run dev"
+      "dev:frontend": "npm --workspace=frontend run dev",
+      "db:up": "docker compose up -d",
+      "db:down": "docker compose down",
+      "seed:admin": "npm --workspace=backend run seed:admin",
+      "seed:demo": "npm --workspace=backend run seed:demo",
+      "doctor": "npx create-storeblocks doctor"
     }
   };
 
@@ -326,6 +342,80 @@ const PAYMENT_LABELS: Record<string, string> = {
   stripe: "Stripe"
 };
 
+/** Generates a tailored docker-compose.yml file based on chosen database and storage provider */
+function buildDockerCompose(projectName: string, database: "mongodb" | "postgresql", storage: string): string {
+  const isMongo = database === "mongodb";
+  const isS3 = storage === "s3";
+  const safeName = path.basename(projectName).toLowerCase().replace(/[^a-z0-9_-]/g, "_") || "storeblocks";
+
+  let lines: string[] = [
+    `# StoreBlocks Docker Compose Configuration for ${projectName}`,
+    `# Run with: docker compose up -d`,
+    `services:`
+  ];
+
+  if (isMongo) {
+    lines.push(
+      `  mongodb:`,
+      `    image: mongo:7.0`,
+      `    container_name: ${safeName}-mongodb`,
+      `    restart: always`,
+      `    ports:`,
+      `      - "27017:27017"`,
+      `    environment:`,
+      `      MONGO_INITDB_DATABASE: storeblocks`,
+      `    volumes:`,
+      `      - mongo_data:/data/db`
+    );
+  } else {
+    lines.push(
+      `  postgres:`,
+      `    image: postgres:16-alpine`,
+      `    container_name: ${safeName}-postgres`,
+      `    restart: always`,
+      `    ports:`,
+      `      - "5432:5432"`,
+      `    environment:`,
+      `      POSTGRES_USER: storeblocks`,
+      `      POSTGRES_PASSWORD: storeblocks_password`,
+      `      POSTGRES_DB: storeblocks`,
+      `    volumes:`,
+      `      - postgres_data:/var/lib/postgresql/data`
+    );
+  }
+
+  if (isS3) {
+    lines.push(
+      ``,
+      `  minio:`,
+      `    image: minio/minio:latest`,
+      `    container_name: ${safeName}-minio`,
+      `    restart: always`,
+      `    command: server /data --console-address ":9001"`,
+      `    ports:`,
+      `      - "9000:9000"`,
+      `      - "9001:9001"`,
+      `    environment:`,
+      `      MINIO_ROOT_USER: minioadmin`,
+      `      MINIO_ROOT_PASSWORD: minioadminpassword`,
+      `    volumes:`,
+      `      - minio_data:/data`
+    );
+  }
+
+  lines.push(``, `volumes:`);
+  if (isMongo) {
+    lines.push(`  mongo_data:`);
+  } else {
+    lines.push(`  postgres_data:`);
+  }
+  if (isS3) {
+    lines.push(`  minio_data:`);
+  }
+
+  return lines.join("\n") + "\n";
+}
+
 /** Builds the README for a generated store. Environment variable names are listed; values never are. */
 function buildStoreReadme(info: {
   projectName: string;
@@ -373,6 +463,8 @@ ${info.projectName}/
 ├── backend/        API server (Express, ${databaseLabel})
 ├── frontend/       Storefront and admin dashboard (Next.js)
 ├── shared/         Types shared by backend and frontend
+├── docker-compose.yml Containerized database configuration
+├── store.config.json  Store configuration descriptor
 ├── .env.example    Environment variable template
 └── README.md
 \`\`\`
@@ -385,13 +477,34 @@ ${info.projectName}/
    npm install
    \`\`\`
 
-2. Create the backend environment file and fill in your values:
+2. Create your environment configuration:
 
    \`\`\`bash
+   cp .env.example .env
    cp .env.example backend/.env
    \`\`\`
 
-3. Run the backend and the storefront together:
+3. Start your local database with Docker:
+
+   \`\`\`bash
+   npm run db:up
+   # Or directly: docker compose up -d
+   \`\`\`
+
+4. Verify your environment & connections with Doctor:
+
+   \`\`\`bash
+   npm run doctor
+   \`\`\`
+
+5. Seed initial admin and demo catalog data:
+
+   \`\`\`bash
+   npm run seed:admin
+   npm run seed:demo
+   \`\`\`
+
+6. Run the backend and storefront together:
 
    \`\`\`bash
    npm run dev

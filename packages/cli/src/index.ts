@@ -34,23 +34,7 @@ function getTemplatesDir(): string {
   throw new Error("Could not locate StoreBlocks templates directory.");
 }
 
-async function main() {
-  const program = new Command()
-    .name("create-storeblocks")
-    .description("Scaffold a production-ready, full-stack e-commerce store in minutes")
-    .argument("[project-name]", "Project name and target directory")
-    .option("--db <database>", "Database: mongodb or postgresql")
-    .option("--storage <storage>", "Media storage: cloudinary, s3, or local")
-    .option("--payments <methods>", "Comma-separated payment methods (cod,sslcommerz,stripe)")
-    .option("--layout <layout>", "Store type: fashion, electronics, grocery, cosmetics, medicine, organic, general, landing")
-    .option("--theme <theme>", "Design theme: minimal, bold, elegant")
-    .option("--features <features>", "Comma-separated optional features")
-    .option("-y, --yes", "Skip interactive prompts and use defaults/flags")
-    .parse(process.argv);
-
-  const options = program.opts();
-  const [projectNameArg] = program.args;
-
+async function scaffoldAction(projectNameArg: string | undefined, options: any) {
   let choices: UserChoices;
 
   if (options.yes) {
@@ -103,8 +87,10 @@ async function main() {
     p.note(
       `${pc.cyan(`cd ${choices.projectName}`)}\n` +
       `${pc.cyan(`cp .env.example .env`)}      ${pc.dim("# configure database connection")}\n` +
+      `${pc.cyan(`docker compose up -d`)}     ${pc.dim("# optional: start local database container")}\n` +
       `${pc.cyan(`npm install`)}\n` +
-      `${pc.cyan(`npm run dev`)}               ${pc.dim("# starts backend API on port 4000")}`,
+      `${pc.cyan(`npx create-storeblocks doctor`)}  ${pc.dim("# verify environment and connections")}\n` +
+      `${pc.cyan(`npm run dev`)}               ${pc.dim("# starts backend API on port 4000 & storefront on 3000")}`,
       "Next steps:"
     );
 
@@ -116,8 +102,39 @@ async function main() {
   }
 }
 
+async function main() {
+  const program = new Command()
+    .name("create-storeblocks")
+    .description("Scaffold a production-ready, full-stack e-commerce store in minutes")
+    .argument("[project-name]", "Project name and target directory")
+    .option("--db <database>", "Database: mongodb or postgresql")
+    .option("--storage <storage>", "Media storage: cloudinary, s3, or local")
+    .option("--payments <methods>", "Comma-separated payment methods (cod,sslcommerz,stripe)")
+    .option("--layout <layout>", "Store type: fashion, electronics, grocery, cosmetics, medicine, organic, general, landing")
+    .option("--theme <theme>", "Design theme: minimal, bold, elegant")
+    .option("--features <features>", "Comma-separated optional features")
+    .option("-y, --yes", "Skip interactive prompts and use defaults/flags")
+    .action(async (projectNameArg, options) => {
+      await scaffoldAction(projectNameArg, options);
+    });
+
+  program
+    .command("doctor")
+    .description("Run pre-flight diagnostics on your StoreBlocks environment and configuration")
+    .option("-d, --dir <directory>", "Target project directory to diagnose", process.cwd())
+    .action(async (cmdOptions) => {
+      const { runDoctor } = await import("./doctor.js");
+      const { success } = await runDoctor(cmdOptions.dir);
+      if (!success) {
+        process.exit(1);
+      }
+      process.exit(0);
+    });
+
+  await program.parseAsync(process.argv);
+}
+
 main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
-
